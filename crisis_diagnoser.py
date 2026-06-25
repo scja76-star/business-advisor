@@ -1,3 +1,4 @@
+from scenario_stress_tester import run_scenario_stress_test
 from devils_advocate import run_devils_advocate
 from dotenv import load_dotenv
 load_dotenv() 
@@ -178,6 +179,25 @@ Return only the JSON. No explanation before or after.
                 monthly_revenue, monthly_costs, cash_on_hand,
                 ai_response, framework['framework'], guardrail
             )
+
+            # --- SCENARIO STRESS TESTER ---
+            if monthly_revenue and monthly_costs and cash_on_hand:
+                stress_results = run_scenario_stress_test(monthly_revenue, monthly_costs, cash_on_hand)
+    
+                with st.expander("⚡ Scenario Stress Tests", expanded=False):
+                    st.markdown("### What if conditions change?")
+                    for scenario in stress_results["scenarios"]:
+                        with st.container():
+                            icon = {"orange": "🟡", "red": "🔴", "green": "🟢"}.get(scenario["survival_color"], "⚪")
+                        st.markdown(f"**{scenario['label']}**")
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.metric("Monthly Profit", f"₹{scenario['monthly_profit']:,}")
+                        with col2:
+                            st.metric("Cash Runway", f"{scenario['cash_runway_months']} months")
+                        with col3:
+                            st.metric("Survival Score", f"{icon} {scenario['survival_label']}")
+                        st.divider()
 
             # Step 6: Trace
             trace = generate_trace(
