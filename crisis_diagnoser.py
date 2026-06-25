@@ -1,3 +1,4 @@
+from devils_advocate import run_devils_advocate
 from dotenv import load_dotenv
 load_dotenv() 
 import streamlit as st
@@ -169,7 +170,16 @@ Return only the JSON. No explanation before or after.
                 monthly_revenue, monthly_costs, cash_on_hand, ai_response
             )
 
-            # Step 5: Trace
+           
+
+           # Step 5: Devil's Advocate
+            devils_advocate_raw = run_devils_advocate(
+                business_type, crisis_type,
+                monthly_revenue, monthly_costs, cash_on_hand,
+                ai_response, framework['framework'], guardrail
+            )
+
+            # Step 6: Trace
             trace = generate_trace(
                 business_type, crisis_type, monthly_revenue,
                 monthly_costs, cash_on_hand, framework,
@@ -270,6 +280,41 @@ Return only the JSON. No explanation before or after.
             st.write(ai_response)
 
         st.markdown("---")
+
+        # Devil's Advocate
+        st.markdown("**😈 Devil's Advocate — Why This Advice Could Fail**")
+        st.caption("A second AI pass that challenges the recommendation before you act on it")
+        try:
+            clean_da = devils_advocate_raw.strip()
+            if clean_da.startswith("```"):
+                clean_da = clean_da.split("```")[1]
+                if clean_da.startswith("json"):
+                    clean_da = clean_da[4:]
+            da = json.loads(clean_da)
+
+            verdict_confidence = da.get("confidence_in_recommendation", "MEDIUM")
+            if verdict_confidence == "LOW":
+                st.error(f"🚨 Confidence in Recommendation: {verdict_confidence}")
+            elif verdict_confidence == "MEDIUM":
+                st.warning(f"⚠️ Confidence in Recommendation: {verdict_confidence}")
+            else:
+                st.success(f"✅ Confidence in Recommendation: {verdict_confidence}")
+
+            st.markdown("**⚡ One Line Verdict**")
+            st.write(da.get("one_line_verdict", ""))
+
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("**🔴 Biggest Flaw**")
+                st.error(da.get("biggest_flaw", ""))
+                st.markdown("**🕳️ Overlooked Risk**")
+                st.warning(da.get("overlooked_risk", ""))
+            with col2:
+                st.markdown("**✅ Better Alternative**")
+                st.success(da.get("better_alternative", ""))
+
+        except:
+            st.write(devils_advocate_raw)
 
         # Explainability
         st.markdown("**🔎 How This Analysis Was Built**")
