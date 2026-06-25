@@ -8,23 +8,22 @@ def run_math_guardrail(monthly_revenue, monthly_costs, cash_on_hand, ai_recommen
     cash_runway = cash_on_hand / monthly_costs if monthly_costs > 0 else 0
     cost_ratio = monthly_costs / monthly_revenue if monthly_revenue > 0 else 1
     gross_margin = (monthly_revenue - monthly_costs) / monthly_revenue if monthly_revenue > 0 else 0
-
-    # Rule 1: Business is losing money
+# Rule 1: Business is losing money — WARNING not block
     if monthly_profit < 0:
-        flags.append(f"⚠️ MATH FLAG: Business is losing ₹{abs(monthly_profit):,} per month. Any recommendation requiring new spending must be questioned.")
+        warnings.append(f"⚠️ Business is losing ₹{abs(monthly_profit):,}/month. AI advice shown with caution.")
 
-    # Rule 2: Less than 1 month cash runway
-    if cash_runway < 1:
-        flags.append(f"🚨 CRITICAL FLAG: Only {cash_runway:.1f} months of cash remaining. Survival is the only priority right now.")
+    # Rule 2: Less than 1 month cash runway — only true critical flag
+    if cash_runway < 1 and cash_on_hand > 0:
+        flags.append(f"🚨 CRITICAL: Only {cash_runway:.1f} months of cash remaining. Survival is the only priority.")
 
-    # Rule 3: Cost ratio dangerously high
+    # Rule 3: Cost ratio dangerously high — WARNING not block
     if cost_ratio > 0.9:
-        flags.append(f"⚠️ MATH FLAG: Costs are {cost_ratio*100:.0f}% of revenue. There is almost no margin for error.")
+        warnings.append(f"⚠️ Costs are {cost_ratio*100:.0f}% of revenue. Very little margin for error.")
 
-    # Rule 4 (NEW): Gross margin too thin even if technically profitable
+    # Rule 4: Gross margin thin — WARNING not block
     if 0 < gross_margin < 0.1:
-        flags.append(f"⚠️ MATH FLAG: Gross margin is only {gross_margin*100:.1f}%. Business is technically profitable but dangerously fragile.")
-
+        warnings.append(f"⚠️ Gross margin is only {gross_margin*100:.1f}%. Technically profitable but fragile.")
+        
     # Rule 5 (FIXED): Check ALL risky words with negation detection
     negation_words = ["don't", "dont", "not", "never", "avoid", "without", "stop"]
     risky_words = ["invest", "hire", "expand", "launch", "spend", "purchase", "buy"]

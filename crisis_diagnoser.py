@@ -266,38 +266,51 @@ Return only the JSON. No explanation before or after.
 
         # AI Analysis
         st.markdown("**🤖 AI Analysis**")
-        try:
-            clean = ai_response.strip()
-            if clean.startswith("```"):
-                clean = clean.split("```")[1]
+
+        # GUARDRAIL ENFORCEMENT
+        if not guardrail.get("guardrail_passed", True) and guardrail.get("flags"):
+            st.error("🚫 AI advice blocked — financial data contains critical errors.")
+            st.markdown("**Fix these issues before proceeding:**")
+            for flag in guardrail["flags"]:
+                st.error(flag)
+            st.info("💡 Correct your revenue, costs, or cash figures and try again.")
+        else:
+            # Show warnings but still display output
+            if guardrail.get("warnings"):
+                st.warning("⚠️ AI advice shown with caution — review flagged items above.")
+
+            try:
+                clean = ai_response.strip()
+                if clean.startswith("```"):
+                    clean = clean.split("```")[1]
                 if clean.startswith("json"):
                     clean = clean[4:]
-            analysis = json.loads(clean)
+                analysis = json.loads(clean)
 
-            urgency = analysis.get("urgency_level", "MEDIUM")
-            if urgency == "CRITICAL":
-                st.error(f"🚨 Urgency Level: {urgency}")
-            elif urgency == "HIGH":
-                st.warning(f"⚠️ Urgency Level: {urgency}")
-            else:
-                st.info(f"ℹ️ Urgency Level: {urgency}")
+                urgency = analysis.get("urgency_level", "MEDIUM")
+                if urgency == "CRITICAL":
+                    st.error(f"🚨 Urgency Level: {urgency}")
+                elif urgency == "HIGH":
+                    st.warning(f"⚠️ Urgency Level: {urgency}")
+                else:
+                    st.info(f"ℹ️ Urgency Level: {urgency}")
 
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown("**🔍 Root Cause**")
-                st.write(analysis.get("root_cause", ""))
-                st.markdown("**📈 Metric to Track Daily**")
-                st.write(analysis.get("metric_to_track", ""))
-                st.markdown("**⏱️ Recovery Timeline**")
-                st.write(analysis.get("realistic_timeline", ""))
-            with col2:
-                st.markdown("**✅ Immediate Action This Week**")
-                st.success(analysis.get("immediate_action", ""))
-                st.markdown("**🚨 Risk If Nothing Changes**")
-                st.error(analysis.get("risk_if_ignored", ""))
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.markdown("**🔍 Root Cause**")
+                    st.write(analysis.get("root_cause", ""))
+                    st.markdown("**📈 Metric to Track Daily**")
+                    st.write(analysis.get("metric_to_track", ""))
+                    st.markdown("**⏱️ Recovery Timeline**")
+                    st.write(analysis.get("realistic_timeline", ""))
+                with col2:
+                    st.markdown("**✅ Immediate Action This Week**")
+                    st.success(analysis.get("immediate_action", ""))
+                    st.markdown("**🚨 Risk If Nothing Changes**")
+                    st.error(analysis.get("risk_if_ignored", ""))
 
-        except:
-            st.write(ai_response)
+            except:
+                st.write(ai_response)
 
         st.markdown("---")
 
