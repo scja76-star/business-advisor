@@ -5,7 +5,7 @@ load_dotenv()
 import streamlit as st
 import json
 import os
-from groq import Groq
+from google import genai
 from framework_matcher import match_framework
 from math_guardrail import run_math_guardrail
 from confidence_rating import calculate_confidence
@@ -141,7 +141,10 @@ Cash on Hand: ₹{cash_on_hand}
 Owner's Description: {description}
 
 Strategic Framework: {framework['framework']}
-Framework context: {framework['description']}
+Framework context: {framework['description']}Framework context: {framework['description']}
+Framework key actions: {', '.join(framework['key_actions'])}
+
+Your immediate_action MUST align with and reference the framework key actions above. Do not contradict them.
 Confidence Level: {confidence['level']}
 
 Indian Market Context — use these flags to make your advice specific to Indian small business realities:
@@ -154,17 +157,18 @@ You must respond in this exact JSON format and nothing else:
     "immediate_action": "single most important action to take this week",
     "metric_to_track": "one specific financial metric to measure daily",
     "risk_if_ignored": "what happens in 30 days if nothing changes",
-    "realistic_timeline": "honest estimate of how long recovery will take"
+   "realistic_timeline": "honest estimate of how long recovery will take",
+    "unified_plan": "2-3 sentence action plan combining the framework actions and your diagnosis into one coherent strategy"
 }}
 
 Return only the JSON. No explanation before or after.
 """
-            client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
-            response = client.chat.completions.create(
-                model="llama-3.1-8b-instant",
-                messages=[{"role": "user", "content": prompt}]
+            client = genai.Client(api_key=os.environ.get("GOOGLE_API_KEY"))
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=prompt
             )
-            ai_response = response.choices[0].message.content
+            ai_response = response.text
 
             # Step 4: Guardrail
             guardrail = run_math_guardrail(
@@ -261,57 +265,53 @@ Return only the JSON. No explanation before or after.
         st.markdown("**Key Actions from Framework:**")
         for action in framework['key_actions']:
             st.markdown(f"• {action}")
-
         st.markdown("---")
 
         # AI Analysis
         st.markdown("**🤖 AI Analysis**")
 
         # GUARDRAIL ENFORCEMENT
-        if not guardrail.get("guardrail_passed", True) and guardrail.get("flags"):
-            st.error("🚫 AI advice blocked — financial data contains critical errors.")
-            st.markdown("**Fix these issues before proceeding:**")
+        if guardrail.get("flags"):
+            st.error("🚨 Critical issues detected — read warnings carefully before acting.")
             for flag in guardrail["flags"]:
                 st.error(flag)
-            st.info("💡 Correct your revenue, costs, or cash figures and try again.")
-        else:
-            # Show warnings but still display output
-            if guardrail.get("warnings"):
-                st.warning("⚠️ AI advice shown with caution — review flagged items above.")
+        if guardrail.get("warnings"):
+            st.warning("⚠️ AI advice shown with caution — review flagged items above.")
 
-            try:
-                clean = ai_response.strip()
-                if clean.startswith("```"):
-                    clean = clean.split("```")[1]
-                if clean.startswith("json"):
-                    clean = clean[4:]
-                analysis = json.loads(clean)
+        try:
+            clean = ai_response.strip()
+            if clean.startswith("```"):
+                clean = clean.split("```")[1]
+            if clean.startswith("json"):
+                clean = clean[4:]
+            analysis = json.loads(clean)
 
-                urgency = analysis.get("urgency_level", "MEDIUM")
-                if urgency == "CRITICAL":
-                    st.error(f"🚨 Urgency Level: {urgency}")
-                elif urgency == "HIGH":
-                    st.warning(f"⚠️ Urgency Level: {urgency}")
-                else:
-                    st.info(f"ℹ️ Urgency Level: {urgency}")
+            urgency = analysis.get("urgency_level", "MEDIUM")
+            if urgency == "CRITICAL":
+                st.error(f"🚨 Urgency Level: {urgency}")
+            elif urgency == "HIGH":
+                st.warning(f"⚠️ Urgency Level: {urgency}")
+            else:
+                st.info(f"ℹ️ Urgency Level: {urgency}")
 
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.markdown("**🔍 Root Cause**")
-                    st.write(analysis.get("root_cause", ""))
-                    st.markdown("**📈 Metric to Track Daily**")
-                    st.write(analysis.get("metric_to_track", ""))
-                    st.markdown("**⏱️ Recovery Timeline**")
-                    st.write(analysis.get("realistic_timeline", ""))
-                with col2:
-                    st.markdown("**✅ Immediate Action This Week**")
-                    st.success(analysis.get("immediate_action", ""))
-                    st.markdown("**🚨 Risk If Nothing Changes**")
-                    st.error(analysis.get("risk_if_ignored", ""))
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("**🔍 Root Cause**")
+                st.write(analysis.get("root_cause", ""))
+                st.markdown("**📈 Metric to Track Daily**")
+                st.write(analysis.get("metric_to_track", ""))
+                st.markdown("**⏱️ Recovery Timeline**")
+                st.write(analysis.get("realistic_timeline", ""))
+            with col2:
+                st.markdown("**✅ Immediate Action This Week**")
+                st.success(analysis.get("immediate_action", ""))
+                st.markdown("**🚨 Risk If Nothing Changes**")
+                st.error(analysis.get("risk_if_ignored", ""))
+                st.markdown("**🎯 Unified Action Plan**")
+                st.success(analysis.get("unified_plan", ""))
 
-            except:
-                st.write(ai_response)
-
+        except:
+            st.write(ai_response)
         st.markdown("---")
 
         # Devil's Advocate

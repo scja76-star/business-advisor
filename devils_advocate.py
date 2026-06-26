@@ -1,5 +1,5 @@
 import os
-from groq import Groq
+from google import genai
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -57,10 +57,10 @@ You must respond in this exact JSON format and nothing else:
 
 Return only the JSON. No explanation before or after."""
 
-    client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
-    response = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
-        messages=[{"role": "user", "content": prompt}]
+    client = genai.Client(api_key=os.environ.get("GOOGLE_API_KEY"))
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt
     )
 
-    return response.choices[0].message.content
+    return response.text
