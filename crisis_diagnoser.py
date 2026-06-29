@@ -11,6 +11,50 @@ from math_guardrail import run_math_guardrail
 from confidence_rating import calculate_confidence
 from explainability_trace import generate_trace
 from indian_sme_context import get_indian_sme_context
+client = genai.Client(api_key=os.environ.get("GOOGLE_API_KEY"))
+
+VALID_CRISIS_TYPES = [
+    "Cash flow problems",
+    "Sales have dropped significantly",
+    "Costs are too high",
+    "Losing customers to competitors",
+    "Demand has fallen",
+    "Operational bottleneck",
+    "Owner is the bottleneck"
+]
+
+
+def classify_crisis(free_text: str) -> str:
+    prompt = f"""You are a business crisis classifier for Indian SMEs.
+
+A business owner has described their situation. Your ONLY job is to classify it into exactly one of these crisis types:
+
+1. Cash flow problems
+2. Sales have dropped significantly
+3. Costs are too high
+4. Losing customers to competitors
+5. Demand has fallen
+6. Operational bottleneck
+7. Owner is the bottleneck
+
+Business situation:
+{free_text}
+
+Rules:
+- Return ONLY the crisis type string, copied exactly as written above
+- No explanation, no punctuation, no quotes, no preamble
+- Choose the single best fit"""
+
+    response = client.models.generate_content(
+    model="gemini-2.5-flash",
+    contents=prompt
+)
+    classified = response.text.strip()
+    
+    if classified not in VALID_CRISIS_TYPES:
+        classified = "Cash flow problems"
+    
+    return classified
 
 # Page config
 st.set_page_config(
@@ -86,35 +130,32 @@ col1, col2 = st.columns(2)
 with col1:
     business_type = st.selectbox("Business Type",
         ["Retail", "Restaurant", "Service Business", "Manufacturing", "Other"])
-with col2:
-    crisis_type = st.selectbox("Primary Crisis",
-        ["Sales have dropped significantly",
-         "Cash flow problems",
-         "Costs are too high",
-         "Losing customers to competitors",
-         "Demand has fallen"])
 
-st.markdown("**Financial Position (Monthly)**")
+st.markdown("**Fhttp://localhost:8501/nancial Position (Monthly)**")
 col1, col2, col3 = st.columns(3)
 with col1:
     monthly_revenue = st.number_input("Revenue (₹)", min_value=0, help="Your total monthly income")
+
 with col2:
     monthly_costs = st.number_input("Costs (₹)", min_value=0, help="Your total monthly expenses")
+
 with col3:
     cash_on_hand = st.number_input("Cash on Hand (₹)", min_value=0, help="Money available right now")
 
-description = st.text_area("Describe Your Situation",
-    placeholder="Be specific — when did this start? What changed? What have you already tried?",
-    height=120)
+situation_text = st.text_area("Describe your situation",
+    placeholder="What is happening with your business? When did it start? What has changed? What have you already tried?",
+    height=150)
 
 st.markdown("---")
 
 analyze_button = st.button("🔍 Analyze My Business", use_container_width=True, type="primary")
 
 if analyze_button:
-    if description:
+    if situation_text:
         with st.spinner("Running analysis..."):
 
+            crisis_type = classify_crisis(situation_text)
+            st.caption(f"🔍 Crisis detected: {crisis_type}")
             # Step 0: Indian SME Context (deterministic, runs before everything)
             sme_context = get_indian_sme_context(
                 business_type, crisis_type,
@@ -123,7 +164,7 @@ if analyze_button:
 
             # Step 1: Confidence
             confidence = calculate_confidence(
-                monthly_revenue, monthly_costs, cash_on_hand, description
+                monthly_revenue, monthly_costs, cash_on_hand, situation_text
             )
 
             # Step 2: Framework
@@ -138,7 +179,7 @@ Crisis: {crisis_type}
 Monthly Revenue: ₹{monthly_revenue}
 Monthly Costs: ₹{monthly_costs}
 Cash on Hand: ₹{cash_on_hand}
-Owner's Description: {description}
+Owner's situation: {situation_text}
 
 Strategic Framework: {framework['framework']}
 Framework context: {framework['description']}Framework context: {framework['description']}
@@ -163,7 +204,7 @@ You must respond in this exact JSON format and nothing else:
 
 Return only the JSON. No explanation before or after.
 """
-            client = genai.Client(api_key=os.environ.get("GOOGLE_API_KEY"))
+            
             response = client.models.generate_content(
                 model="gemini-2.5-flash",
                 contents=prompt
