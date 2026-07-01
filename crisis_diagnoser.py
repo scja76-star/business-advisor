@@ -309,6 +309,79 @@ Return only the JSON. No explanation before or after.
 
         st.markdown("---")
 
+
+
+
+
+
+
+
+
+
+        st.markdown("#### 🤔 Universal Diagnostic Question: **How many many days between raw material entering your factory and cash arriving in your bank?** (This measures WIP/inventory-as-trapped-cash)")
+        st.markdown("---")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        # New JTBD-style question
+        if crisis_type in ["Sales have dropped significantly", "Demand has fallen", "Losing customers to competitors"]:
+            st.markdown("#### ❓ JTBD Root-Cause Diagnostic: **What specific 'job' were customers hiring your product to do — and where are they now getting that job done instead?**")
+        st.markdown("---")
+        # 4. Altman Z-Score checkpoint - Display before other financial flags
+        st.markdown("### 🔍 Universal Financial Health Checks")
+        st.info("🚨 **Critical Solvency Check:** Always calculate your Altman Z-Score. A score below 1.1 indicates high financial distress and requires immediate attention, regardless of specific crisis type.")
+
+
+
+
+        # 9. Vendor credit before external debt
+        if crisis_type == "Cash flow problems" or (cash_on_hand / (monthly_costs if monthly_costs > 0 else 1) < 3 and (monthly_revenue - monthly_costs) < 0):
+             st.warning("🤝 **Prioritize Vendor Credit:** Before seeking new loans (e.g., ECLGS), aggressively renegotiate payment terms with existing vendors. This is often the fastest, lowest-cost source of temporary liquidity.")
+        st.markdown("---")
+
         # Framework
         st.markdown(f"**🎯 Strategic Framework: {framework['framework']}**")
         priority_color = "🔴" if framework['priority'] == "CRITICAL" else "🟡" if framework['priority'] == "HIGH" else "🟢"
@@ -330,8 +403,13 @@ Return only the JSON. No explanation before or after.
                 st.error(flag)
         if guardrail.get("warnings"):
             st.warning("⚠️ AI advice shown with caution — review flagged items above.")
-
         try:
+
+
+
+
+
+
             clean = ai_response.strip()
             if clean.startswith("```"):
                 clean = clean.split("```")[1]
@@ -339,16 +417,32 @@ Return only the JSON. No explanation before or after.
                 clean = clean[4:]
             analysis = json.loads(clean)
 
+
+
+
+
+
             urgency = analysis.get("urgency_level", "MEDIUM")
             if urgency == "CRITICAL":
                 st.error(f"🚨 Urgency Level: {urgency}")
             elif urgency == "HIGH":
                 st.warning(f"⚠️ Urgency Level: {urgency}")
             else:
-                st.info(f"ℹ️ Urgency Level: {urgency}")
 
+
+
+
+
+                st.info(f"ℹ️ Urgency Level: {urgency}")
             col1, col2 = st.columns(2)
             with col1:
+
+
+
+
+
+
+
                 st.markdown("**🔍 Root Cause**")
                 st.write(analysis.get("root_cause", ""))
                 st.markdown("**📈 Metric to Track Daily**")
@@ -364,8 +458,24 @@ Return only the JSON. No explanation before or after.
                 st.success(analysis.get("unified_plan", ""))
 
         except:
+
             st.write(ai_response)
         st.markdown("---")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         # Devil's Advocate
         st.markdown("**😈 Devil's Advocate — Why This Advice Could Fail**")
@@ -383,7 +493,7 @@ Return only the JSON. No explanation before or after.
                 st.error(f"🚨 Confidence in Recommendation: {verdict_confidence}")
             elif verdict_confidence == "MEDIUM":
                 st.warning(f"⚠️ Confidence in Recommendation: {verdict_confidence}")
-            else:
+    else:
                 st.success(f"✅ Confidence in Recommendation: {verdict_confidence}")
 
             st.markdown("**⚡ One Line Verdict**")
