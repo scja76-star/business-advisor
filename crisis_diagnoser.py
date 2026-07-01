@@ -30,10 +30,10 @@ def classify_crisis(free_text: str) -> str:
 A business owner has described their situation. Your ONLY job is to classify it into exactly one of these crisis types:
 
 1. Cash flow problems
-2. Sales have dropped significantly
+2. Sales have dropped significantly (customers/market still exist, but conversion, retention, or competitive positioning has weakened. Example inputs: "sales are down", "we're losing deals we used to win", "revenue dropped this quarter")
 3. Costs are too high
 4. Losing customers to competitors
-5. Demand has fallen
+5. Demand has fallen (the market itself has shrunk or shifted — structural, not a sales execution problem. Example inputs: "nobody is buying our product anymore", "the whole market has dried up", "demand has completely stalled")
 6. Operational bottleneck
 7. Owner is the bottleneck
 
@@ -182,14 +182,17 @@ Cash on Hand: ₹{cash_on_hand}
 Owner's situation: {situation_text}
 
 Strategic Framework: {framework['framework']}
-Framework context: {framework['description']}Framework context: {framework['description']}
+Framework context: {framework['description']}
 Framework key actions: {', '.join(framework['key_actions'])}
 
 Your immediate_action MUST align with and reference the framework key actions above. Do not contradict them.
 Confidence Level: {confidence['level']}
 
-Indian Market Context — use these flags to make your advice specific to Indian small business realities:
+Seasonal Market Flags — use these flags to make your advice specific to Indian small business realities:
 {chr(10).join(sme_context['all_context']) if sme_context['all_context'] else 'No specific seasonal or market flags this month.'}
+
+Crisis-Specific Indian SME Context — use these framework-specific Indian SME insights to tailor the plan:
+{framework.get('indian_sme_context', 'No crisis-specific Indian SME context available.')}
 
 You must respond in this exact JSON format and nothing else:
 {{
@@ -277,6 +280,15 @@ Return only the JSON. No explanation before or after.
             st.markdown("**🇮🇳 Indian Market Flags**")
             for flag in sme_context["context_flags"]:
                 st.warning(f"🏦 {flag}")
+
+        if framework.get("indian_sme_context"):
+            st.markdown("**🧠 Crisis-Specific Indian SME Context**")
+            context_value = framework["indian_sme_context"]
+            if isinstance(context_value, list):
+                for item in context_value:
+                    st.info(f"• {item}")
+            else:
+                st.info(context_value)
 
         if sme_context["seasonal_alerts"]:
             st.markdown("**📅 Seasonal Alerts**")

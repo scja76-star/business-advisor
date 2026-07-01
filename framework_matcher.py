@@ -43,19 +43,34 @@ def match_framework(crisis_type, monthly_revenue, monthly_costs, cash_on_hand):
     # CRISIS TYPE 2: SALES HAVE DROPPED SIGNIFICANTLY
     # ─────────────────────────────────────────────────────────────
     elif crisis_type == "Sales have dropped significantly":
+        # IMPORTANT: this branch is for the sales-drop diagnosis only.
+        # Do not modify the existing branches for Doc 1, Doc 6, or Doc 7.
         return {
             "framework": "Jobs To Be Done (Christensen) as primary diagnostic; Porter's Five Forces for structural threat analysis; Strategic Inflection Points (Grove) for 10X shift detection; Porter's Generic Strategies for repositioning",
             "literature_basis": (
-                "Clayton Christensen — JTBD theory; Michael Porter — Five Forces, Generic Strategies; Andy Grove — \"Only The Paranoid Survive\"; Kim & Mauborgne — Blue Ocean Strategy; Altman Z-Score"
+                "Clayton Christensen — JTBD theory; "
+                "Michael Porter — Five Forces, Generic Strategies; "
+                "Andy Grove — \"Only The Paranoid Survive\"; "
+                "Kim & Mauborgne — Blue Ocean Strategy; "
+                "Altman Z-Score"
             ),
             "description": (
-                "Sales drops are misdiagnosed as marketing problems. They are almost always structural — the product was fired by customers for a better substitute, the industry hit a strategic inflection point, or the firm drifted into the fatal \"stuck in the middle\" zone with no defensible position."
+                "Sales drops are misdiagnosed as marketing problems. They are almost always structural "
+                "— the product was fired by customers for a better substitute, the industry hit a "
+                "strategic inflection point, or the firm drifted into the fatal \"stuck in the middle\" zone with no defensible position."
             ),
             "elite_principle": (
-                "Customers do not buy products. They hire them to make progress in a specific struggling moment. When sales drop, the product was not beaten by a competitor — it was fired by the customer for failing to do the job. Find the job. Redesign the product around it. — Christensen, JTBD"
+                "Customers do not buy products. They hire them to make progress in a specific "
+                "struggling moment. When sales drop, the product was not beaten by a competitor — "
+                "it was fired by the customer for failing to do the job. Find the job. Redesign the product around it. "
+                "— Christensen, JTBD"
             ),
             "indian_sme_context": (
-                "[DERIVED — verify all] (1) GST implementation created a permanent structural inflection point for Indian SMEs — competitors who formalized and claimed ITC gained a structural cost advantage. If sales dropped post-2017, check if this is the real cause. (2) GeM (Government e-Marketplace) portal — if your SME sells B2G, dropping sales may reflect procurement shifting to GeM-registered competitors. Register immediately. (3) Rajasthan-specific: textile and auto parts SMEs face substitution threat from Chinese imports via informal channels. JTBD analysis will reveal if price is the job — if yes, cost leadership is the only viable path. (4) Udyam registration unlocks priority sector lending — if sales drop is forcing a credit crunch, this is the fastest legitimate financing lever."
+                "[DERIVED — verify all]\n"
+                "(1) GST implementation created a permanent structural inflection point for Indian SMEs — competitors who formalized and claimed ITC gained a structural cost advantage. If sales dropped post-2017, check if this is the real cause.\n"
+                "(2) GeM (Government e-Marketplace) portal — if your SME sells B2G, dropping sales may reflect procurement shifting to GeM-registered competitors. Register immediately.\n"
+                "(3) Rajasthan-specific: textile and auto parts SMEs face substitution threat from Chinese imports via informal channels. JTBD analysis will reveal if price is the job — if yes, cost leadership is the only viable path.\n"
+                "(4) Udyam registration unlocks priority sector lending — if sales drop is forcing a credit crunch, this is the fastest legitimate financing lever."
             ),
             "priority": "HIGH — sustained sales decline triggers cash flow crisis within 60-90 days for most manufacturing SMEs",
             "key_actions": [
@@ -76,30 +91,41 @@ def match_framework(crisis_type, monthly_revenue, monthly_costs, cash_on_hand):
     # ─────────────────────────────────────────────────────────────
     elif crisis_type == "Costs are too high":
         return {
-            "framework": "Zero-Based Budgeting (ZBB) as primary cost elimination tool; Value Chain Analysis for cost location; Blue Ocean ERRC Grid for cost-value restructuring; TOC for WIP cost reduction",
+            "framework": "Zero-Based Budgeting (ZBB) as primary; Value Chain Analysis for cost location; Blue Ocean ERRC Grid for cost-value restructuring; TOC for WIP cost reduction",
             "literature_basis": (
-                "Zero-Based Budgeting — Peter Pyhrr (1970); Michael Porter — Value Chain Analysis; Kim & Mauborgne — \"Blue Ocean Strategy\"; Eliyahu Goldratt — TOC"
+                "Zero-Based Budgeting — Peter Pyhrr (1970); "
+                "Michael Porter — Value Chain; "
+                "Kim & Mauborgne — Blue Ocean Strategy; "
+                "Eliyahu Goldratt — TOC"
             ),
             "description": (
-                "Cost crises in manufacturing SMEs are caused by three hidden mechanisms: legacy budgeting habits that let obsolete costs compound invisibly year-on-year; over-engineered products absorbing costs for features buyers never valued; and bloated support activities consuming more than primary operations. The owner sees high costs but cannot locate exactly where they live."
+                "Cost crises caused by three hidden mechanisms: legacy budgeting habits letting obsolete costs compound invisibly; "
+                "over-engineered products absorbing costs for features buyers never valued; bloated support activities consuming more than primary operations. "
+                "Owner sees high costs but cannot locate exactly where they live."
             ),
             "elite_principle": (
-                "The most dangerous costs in any SME are the ones that have always been there. They hide behind habit, not necessity. Zero-Based Budgeting forces every single rupee to prove its right to exist — not based on last year, but based on today's strategic reality. — ZBB doctrine, Pyhrr"
+                "The most dangerous costs in any SME are the ones that have always been there. They hide behind habit not necessity. "
+                "Zero-Based Budgeting forces every single rupee to prove its right to exist — not based on last year but on today's strategic reality. "
+                "— ZBB doctrine, Pyhrr"
             ),
             "indian_sme_context": (
-                "[MIXED — DOC + DERIVED, verify marked items] FROM DOC: (1) Force every department head to justify every single rupee from zero — Indian SME owners typically inherit vendor contracts and cost structures from their father's era; ZBB breaks this cycle DERIVED: (2) GST Input Tax Credit (ITC) audit — most Indian manufacturing SMEs have unclaimed ITC sitting on input materials. Run a full ITC reconciliation before cutting operational costs (3) MSME Samadhaan portal — if high costs are partly caused by delayed receivables forcing you to bridge with expensive short-term debt, file pending payment claims here first (4) Rajasthan textile/auto parts SMEs specifically: audit power costs separately — electricity tariff arbitrage between industrial and commercial rates is a common hidden cost leak"
+                "(1) Force every department head to justify every single rupee from zero — Indian SME owners typically inherit vendor contracts from their father's era. "
+                "ZBB breaks this. (2) GST ITC audit — most Indian manufacturing SMEs have unclaimed ITC on input materials. Run full reconciliation before cutting costs. "
+                "(3) MSME Samadhaan — if high costs partly caused by delayed receivables forcing expensive short-term debt, file pending payment claims here first. "
+                "(4) Rajasthan textile/auto parts: audit power costs separately — electricity tariff arbitrage between industrial and commercial rates is common hidden cost leak."
             ),
-            "priority": "HIGH — cost structure above break-even threshold destroys margin on every unit sold regardless of sales volume",
+            "priority": "HIGH — cost structure above break-even destroys margin on every unit regardless of sales volume",
             "key_actions": [
-                "Run Value Chain mapping first: walk every step of production and mark each activity as either Revenue-Generating or Cost-Only. Any Cost-Only activity with no customer value is a cut candidate.",
-                "Pull last 12 months of vendor invoices. Mark every contract that auto-renewed without review. These are your first ZBB targets.",
-                "Kill every SKU with negative contribution margin immediately. Calculate contribution margin per SKU before any other action.",
-                "Run ERRC grid on your top 3 products: what features can be eliminated or reduced without the customer noticing? What one feature can be raised to justify a price premium?",
-                "Stop all machines except the bottleneck from running at full capacity — excess production is a cost masquerading as productivity.",
-                "Audit GST ITC claims. Unclaimed input credit is cash sitting in your cost structure that belongs to you."
+                "Run Value Chain mapping: mark each activity as Revenue-Generating or Cost-Only. Any Cost-Only with no customer value is a cut.",
+                "Pull last 12 months vendor invoices. Mark every contract that auto-renewed without review. These are first ZBB targets.",
+                "Kill every SKU with negative contribution margin immediately.",
+                "Run ERRC grid on top 3 products: what can be eliminated without customer noticing? What one feature justifies price premium?",
+                "Stop all machines except bottleneck from running at full capacity.",
+                "Audit GST ITC claims. Unclaimed input credit is cash sitting in your cost structure."
             ],
             "decision_rule": (
-                "Apply when: costs are rising faster than revenue, vendor contracts auto-renew without scrutiny, support costs exceed primary operation costs, or owner cannot name the top 3 cost drivers without checking reports. Trigger question — 'If this cost did not exist last year, would I create it today?'"
+                "Apply when costs rising faster than revenue, vendor contracts auto-renew without scrutiny, support costs exceed primary operation costs, "
+                "owner cannot name top 3 cost drivers without checking reports. Trigger question — If this cost did not exist last year, would I create it today?"
             )
         }
 
@@ -110,16 +136,32 @@ def match_framework(crisis_type, monthly_revenue, monthly_costs, cash_on_hand):
         return {
             "framework": "Jobs To Be Done (Christensen) for defection diagnosis; 7 Powers (Hamilton Helmer) for structural barrier building; Value Map / EVC for repositioning; Porter's Generic Strategies for commitment to defensible position",
             "literature_basis": (
-                "Clayton Christensen — JTBD theory; Hamilton Helmer — \"7 Powers\"; Michael Porter — Generic Strategies; Kim & Mauborgne — Blue Ocean Strategy; VRIO Framework — Barney (1991)"
+                "Clayton Christensen — JTBD theory; "
+                "Hamilton Helmer — \"7 Powers\"; "
+                "Michael Porter — Generic Strategies; "
+                "Kim & Mauborgne — Blue Ocean Strategy; "
+                "VRIO Framework — Barney (1991)"
             ),
             "description": (
-                "Customer loss is misread as a pricing problem. It is almost always a structural failure — the product was fired for a rival that better resolves the customer's struggling moment, or the SME has no defensible barrier preventing competitors from arbitraging away its margins. The firm drifted into competitive parity without noticing."
+                "Customer loss is misread as a pricing problem. It is almost always a structural failure — "
+                "the product was fired for a rival that better resolves the customer's struggling moment, or "
+                "the SME has no defensible barrier preventing competitors from arbitraging away its margins. "
+                "The firm drifted into competitive parity without noticing."
             ),
             "elite_principle": (
-                "Losing customers is not a sales problem. It is a structural architecture problem. Without a Power — a Switching Cost, a Process Barrier, a Counter-Position — your margins will be arbitraged away by any competitor willing to undercut you by 5%. Build the barrier first. Compete second. — Helmer, 7 Powers"
+                "Losing customers is not a sales problem. It is a structural architecture problem. "
+                "Without a Power — a Switching Cost, a Process Barrier, a Counter-Position — your margins "
+                "will be arbitraged away by any competitor willing to undercut you by 5%. "
+                "Build the barrier first. Compete second. — Helmer, 7 Powers"
             ),
             "indian_sme_context": (
-                "[MIXED — DOC + DERIVED, verify marked] FROM DOC: (1) Embed IT, auto parts, or manufacturing systems so deeply into the customer's operations that switching becomes operationally painful — this is your primary Switching Cost barrier in the Indian B2B context DERIVED: (2) Indian B2B SMEs losing customers to larger competitors: check if the rival is GeM-registered and winning government contracts you are invisible to — register on GeM immediately (3) Rajasthan auto parts / textile SMEs: Chinese import substitution is the most common structural threat. If this is the cause, cost leadership via TOC + ZBB is the only viable path — differentiation will not work against a 40% price gap (4) JTBD interviews in Indian B2B context should specifically probe payment terms — Indian SME customers frequently defect not for product quality but because a competitor offered net-60 vs your net-30. This is a financial job, not a product job"
+                "[MIXED — DOC + DERIVED, verify marked]\n"
+                "FROM DOC:\n"
+                "(1) Embed IT, auto parts, or manufacturing systems so deeply into the customer's operations that switching becomes operationally painful — this is your primary Switching Cost barrier in the Indian B2B context\n"
+                "DERIVED:\n"
+                "(2) Indian B2B SMEs losing customers to larger competitors: check if the rival is GeM-registered and winning government contracts you are invisible to — register on GeM immediately\n"
+                "(3) Rajasthan auto parts / textile SMEs: Chinese import substitution is the most common structural threat. If this is the cause, cost leadership via TOC + ZBB is the only viable path — differentiation will not work against a 40% price gap\n"
+                "(4) JTBD interviews in Indian B2B context should specifically probe payment terms — Indian SME customers frequently defect not for product quality but because a competitor offered net-60 vs your net-30. This is a financial job, not a product job"
             ),
             "priority": "HIGH — customer defection compounds; each lost account reduces referral network and signals market weakness to remaining clients",
             "key_actions": [
@@ -142,7 +184,11 @@ def match_framework(crisis_type, monthly_revenue, monthly_costs, cash_on_hand):
         return {
             "framework": "Disruptive Innovation (Christensen) for permanent demand diagnosis; Ansoff Matrix for pivot path selection; Product Life Cycle for catalog triage; Strategic Inflection Points (Grove) for 10X shift detection; TOC for inventory protection during collapse",
             "literature_basis": (
-                "Clayton Christensen — \"The Innovator's Dilemma\" (Disruptive Innovation); Igor Ansoff — Ansoff Matrix; Andy Grove — \"Only The Paranoid Survive\"; Eliyahu Goldratt — TOC; Product Life Cycle — Theodore Levitt (1965)"
+                "Clayton Christensen — \"The Innovator's Dilemma\" (Disruptive Innovation); "
+                "Igor Ansoff — Ansoff Matrix; "
+                "Andy Grove — \"Only The Paranoid Survive\"; "
+                "Eliyahu Goldratt — TOC; "
+                "Product Life Cycle — Theodore Levitt (1965)"
             ),
             "description": (
                 "Demand collapse is the most misdiagnosed crisis. Owners treat a structural, permanent demand shift as a temporary cyclical dip and keep cutting prices into a market that will never return. The critical first question is not how to recover demand — it is whether the demand is recoverable at all."
@@ -151,7 +197,13 @@ def match_framework(crisis_type, monthly_revenue, monthly_costs, cash_on_hand):
                 "The single most dangerous move during a demand collapse is optimizing harder for a market that no longer exists. Before any recovery action, answer one question: is this a cyclical dip or a structural extinction? The entire strategy changes based on that single diagnosis. — Grove, Strategic Inflection Points"
             ),
             "indian_sme_context": (
-                "[MIXED — DOC + DERIVED, verify marked] FROM DOC: (1) Indian SME facing a 10X demand collapse must be willing to entirely abandon its legacy identity and re-tool machinery for a new viable market — Intel's pivot from memory chips to processors is the exact model DERIVED: (2) Ansoff Market Development for Indian SMEs: ONDC (Open Network for Digital Commerce) and DGFT export promotion schemes are the fastest routes to new geographic markets without heavy capital investment (3) Rajasthan textile / auto parts SMEs facing Chinese import disruption: this is a structural 10X shift, not a cycle. PLI (Production Linked Incentive) scheme eligibility should be checked immediately — it funds exactly the machinery re-tooling Ansoff's Product Development path requires (4) Product Life Cycle triage: map your SKUs and kill decline-stage products before GST filing season — liquidating dead inventory pre-filing cleans balance sheet and recovers ITC"
+                "[MIXED — DOC + DERIVED, verify marked]\n"
+                "FROM DOC:\n"
+                "(1) Indian SME facing a 10X demand collapse must be willing to entirely abandon its legacy identity and re-tool machinery for a new viable market — Intel's pivot from memory chips to processors is the exact model\n"
+                "DERIVED:\n"
+                "(2) Ansoff Market Development for Indian SMEs: ONDC (Open Network for Digital Commerce) and DGFT export promotion schemes are the fastest routes to new geographic markets without heavy capital investment\n"
+                "(3) Rajasthan textile / auto parts SMEs facing Chinese import disruption: this is a structural 10X shift, not a cycle. PLI (Production Linked Incentive) scheme eligibility should be checked immediately — it funds exactly the machinery re-tooling Ansoff's Product Development path requires\n"
+                "(4) Product Life Cycle triage: map your SKUs and kill decline-stage products before GST filing season — liquidating dead inventory pre-filing cleans balance sheet and recovers ITC"
             ),
             "priority": "CRITICAL — permanent demand collapse with no pivot decision is a slow liquidation event; every month of inaction compounds cash burn on dead inventory",
             "key_actions": [
