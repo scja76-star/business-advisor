@@ -413,7 +413,7 @@ Return only the JSON. No explanation before or after.
             clean = ai_response.strip()
             if clean.startswith("```"):
                 clean = clean.split("```")[1]
-            if clean.startswith("json"):
+ GST ITC            if clean.startswith("json"):
                 clean = clean[4:]
             analysis = json.loads(clean)
 
@@ -493,7 +493,7 @@ Return only the JSON. No explanation before or after.
                 st.error(f"🚨 Confidence in Recommendation: {verdict_confidence}")
             elif verdict_confidence == "MEDIUM":
                 st.warning(f"⚠️ Confidence in Recommendation: {verdict_confidence}")
-    else:
+            else:
                 st.success(f"✅ Confidence in Recommendation: {verdict_confidence}")
 
             st.markdown("**⚡ One Line Verdict**")
