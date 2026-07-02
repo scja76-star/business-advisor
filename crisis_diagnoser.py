@@ -156,6 +156,7 @@ if analyze_button:
 
             crisis_type = classify_crisis(situation_text)
             st.caption(f"🔍 Crisis detected: {crisis_type}")
+            st.info("ℹ️ Strategic framework matched deterministically before AI plan generation.")
             # Step 0: Indian SME Context (deterministic, runs before everything)
             sme_context = get_indian_sme_context(
                 business_type, crisis_type,
@@ -318,49 +319,8 @@ Return only the JSON. No explanation before or after.
 
 
 
-        st.markdown("#### 🤔 Universal Diagnostic Question: **How many many days between raw material entering your factory and cash arriving in your bank?** (This measures WIP/inventory-as-trapped-cash)")
+        st.markdown("#### 🤔 Universal Diagnostic Question: **How many days between raw material entering your factory and cash arriving in your bank?** (This measures WIP/inventory-as-trapped-cash)")
         st.markdown("---")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -374,7 +334,10 @@ Return only the JSON. No explanation before or after.
         st.markdown("### 🔍 Universal Financial Health Checks")
         st.info("🚨 **Critical Solvency Check:** Always calculate your Altman Z-Score. A score below 1.1 indicates high financial distress and requires immediate attention, regardless of specific crisis type.")
 
-
+        # Owner Time Audit (E-Myth)
+        if crisis_type == "Owner is the bottleneck":
+            st.markdown("#### ⏱️ Owner Time Audit: **Of your working hours this week, how many were spent working IN the business (doing tasks) versus ON the business (deciding, delegating, planning)?** If most decisions — even small ones made by staff or family — still route through you for approval, that is the structural bottleneck, not a staffing shortage.")
+        st.markdown("---")
 
 
         # 9. Vendor credit before external debt
@@ -407,13 +370,10 @@ Return only the JSON. No explanation before or after.
 
 
 
-
-
-
             clean = ai_response.strip()
             if clean.startswith("```"):
                 clean = clean.split("```")[1]
- GST ITC            if clean.startswith("json"):
+            if clean.startswith("json"):
                 clean = clean[4:]
             analysis = json.loads(clean)
 
