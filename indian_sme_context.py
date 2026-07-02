@@ -57,7 +57,11 @@ def get_indian_sme_context(business_type, crisis_type, monthly_revenue, monthly_
 
     if crisis_type == "Costs are too high" and business_type == "Manufacturing":
         scheme_suggestions.append("MSME Samadhaan Portal: If delayed payments from larger buyers are straining you, file for recovery under the MSME Act.")
+    if len(scheme_suggestions) >= 1:
+        scheme_suggestions.append("SCHEME STACKING: These government schemes are not mutually exclusive. Udyam Registration is often a prerequisite for MUDRA and ECLGS eligibility — complete it first if not already done. GeM and ONDC marketplace listings build revenue history that strengthens future loan applications. Combine credit relief schemes with visibility schemes rather than relying on just one.")
 
+    if annual_revenue < 5000000:
+        scheme_suggestions.append("FAMILY BUSINESS DYNAMICS: In owner-led and family-run SMEs, decision authority is often informally shared across family members regardless of formal titles. Crisis response plans should account for who actually holds veto power on financial decisions, not just who is listed as owner.")
     return {
         "context_flags": context_flags,
         "seasonal_alerts": seasonal_alerts,
