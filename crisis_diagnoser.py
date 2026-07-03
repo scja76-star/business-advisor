@@ -131,7 +131,7 @@ with col1:
     business_type = st.selectbox("Business Type",
         ["Retail", "Restaurant", "Service Business", "Manufacturing", "Other"])
 
-st.markdown("**Fhttp://localhost:8501/nancial Position (Monthly)**")
+st.markdown("**Fnancial Position (Monthly)**")
 col1, col2, col3 = st.columns(3)
 with col1:
     monthly_revenue = st.number_input("Revenue (₹)", min_value=0, help="Your total monthly income")
