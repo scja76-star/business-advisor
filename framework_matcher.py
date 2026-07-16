@@ -1,10 +1,11 @@
-def match_framework(crisis_type, monthly_revenue, monthly_costs, cash_on_hand):
+def match_framework(crisis_type, monthly_revenue, monthly_cogs, monthly_operating_expenses, cash_on_hand):
 
     # Calculate key financial indicators
-    profit = monthly_revenue - monthly_costs
-    cash_runway = cash_on_hand / monthly_costs if monthly_costs > 0 else 0
-    cost_ratio = monthly_costs / monthly_revenue if monthly_revenue > 0 else 1
-    gross_margin = (monthly_revenue - monthly_costs) / monthly_revenue if monthly_revenue > 0 else 0
+    monthly_total_costs = monthly_cogs + monthly_operating_expenses
+    profit = monthly_revenue - monthly_total_costs
+    cash_runway = cash_on_hand / monthly_total_costs if monthly_total_costs > 0 else 0
+    cost_ratio = monthly_total_costs / monthly_revenue if monthly_revenue > 0 else 1
+    gross_margin = (monthly_revenue - monthly_cogs) / monthly_revenue if monthly_revenue > 0 else 0
 
     # ─────────────────────────────────────────────────────────────
     # CRISIS TYPE 1: CASH FLOW PROBLEMS
@@ -23,7 +24,7 @@ def match_framework(crisis_type, monthly_revenue, monthly_costs, cash_on_hand):
                 "An Indian SME does not run out of cash because it lacks sales. It runs out of cash because its factory floor converts raw material into finished goods in weeks not days. Every extra day of WIP is a silent loan the owner gave their own factory — at zero interest, with no repayment date."
             ),
             "indian_sme_context": (
-                "(1) Altman Z-Score survival threshold for Indian SMEs is 1.1. Calculate before doing anything else. (2) Abandon EOQ bulk purchasing logic. (3) ECLGS credit line only to bridge gap while fixing WIP velocity — not to fund continued overproduction. (4) Convert raw material to cash in days not weeks."
+                "(1) Altman Z-Score survival threshold for Indian SMEs is 1.1. Calculate before doing anything else. (2) Abandon EOQ bulk purchasing logic. (3) ECLGS 5.0 credit line only to bridge gap while fixing WIP velocity — not to fund continued overproduction. Note: ECLGS 5.0 requires an existing standard (non-NPA) working capital account as of March 2026 — new-to-credit businesses without an existing limit are not eligible under this version. Confirm with your bank first. (4) Convert raw material to cash in days not weeks."
             ),
             "priority": "CRITICAL — cash flow failure is #1 cause of SME death",
             "key_actions": [
@@ -31,7 +32,7 @@ def match_framework(crisis_type, monthly_revenue, monthly_costs, cash_on_hand):
                 "Walk floor, find where WIP physically piles up. That pile is your trapped cash.",
                 "Halt raw material releases until bottleneck signals it can consume them",
                 "Cut batch sizes. Run SMED workshop to get changeover under 10 minutes",
-                "Run DuPont decomposition: is ROE driven by real efficiency or debt leverage?",
+                "Manually calculate DuPont ROE decomposition using your balance sheet (net margin x asset turnover x equity multiplier) — this app does not currently collect equity/asset data, so this step is done outside the tool.",
                 "Liquidate dead inventory and idle assets. Pay down highest-interest debt first."
             ],
             "decision_rule": (
@@ -202,7 +203,7 @@ def match_framework(crisis_type, monthly_revenue, monthly_costs, cash_on_hand):
                 "(1) Indian SME facing a 10X demand collapse must be willing to entirely abandon its legacy identity and re-tool machinery for a new viable market — Intel's pivot from memory chips to processors is the exact model\n"
                 "DERIVED:\n"
                 "(2) Ansoff Market Development for Indian SMEs: ONDC (Open Network for Digital Commerce) and DGFT export promotion schemes are the fastest routes to new geographic markets without heavy capital investment\n"
-                "(3) Rajasthan textile / auto parts SMEs facing Chinese import disruption: this is a structural 10X shift, not a cycle. PLI (Production Linked Incentive) scheme eligibility should be checked immediately — it funds exactly the machinery re-tooling Ansoff's Product Development path requires\n"
+               "(3) Rajasthan textile / auto parts SMEs facing Chinese import disruption: this is a structural 10X shift, not a cycle. PLI Textiles requires minimum investment of Rs 50 crore+ (Part-2 category) — realistic only for large-scale retooling, not most SMEs. Below that scale, check Rajasthan state MSME schemes or bank term loans instead\n"
                 "(4) Product Life Cycle triage: map your SKUs and kill decline-stage products before GST filing season — liquidating dead inventory pre-filing cleans balance sheet and recovers ITC"
             ),
             "priority": "CRITICAL — permanent demand collapse with no pivot decision is a slow liquidation event; every month of inaction compounds cash burn on dead inventory",
@@ -212,7 +213,7 @@ def match_framework(crisis_type, monthly_revenue, monthly_costs, cash_on_hand):
                 "Apply Grove's silver bullet test: if your most feared low-cost competitor had one move to permanently take your market, have they already made it? If yes, you are past the inflection point.",
                 "Run Ansoff on surviving products: can existing products go to new geographies or adjacent industries? Check ONDC and DGFT export schemes before spending on product development.",
                 "Halt all raw material releases immediately. Do not produce a single unit without a firm customer due date attached. Demand collapse + excess inventory = bankruptcy.",
-                "Check PLI scheme eligibility if re-tooling is the chosen path — government subsidy on new machinery changes the capital calculus for Ansoff's Product Development pivot completely."
+                "Check PLI scheme eligibility only if retooling investment will exceed Rs 50 crore — otherwise check Rajasthan state MSME schemes or bank term loans for smaller machinery upgrades."
             ],
             "decision_rule": (
                 "Apply when: sales volume drops 30%+ with no recovery after 2 quarters of price cuts, entire customer segments stop ordering rather than switching to competitors, or a new technology/import is structurally undercutting your cost floor. Trigger question — 'Are my customers buying less of everything, or have they found a permanently better alternative to what I sell?'"

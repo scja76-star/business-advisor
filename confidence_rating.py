@@ -1,4 +1,4 @@
-def calculate_confidence(monthly_revenue, monthly_costs, cash_on_hand, description):
+def calculate_confidence(monthly_revenue, monthly_cogs, monthly_operating_expenses, cash_on_hand, description):
     
     score = 0
     reasons = []
@@ -11,12 +11,20 @@ def calculate_confidence(monthly_revenue, monthly_costs, cash_on_hand, descripti
     else:
         deductions.append("❌ No revenue data — analysis is less precise")
 
-    if monthly_costs > 0:
+    if monthly_cogs > 0 and monthly_operating_expenses > 0:
         score += 25
-        reasons.append("✅ Monthly costs provided")
+        reasons.append("✅ Both COGS and operating expenses provided")
+    elif monthly_cogs > 0 or monthly_operating_expenses > 0:
+        score += 12
+        reasons.append("⚠️ Only partial cost data provided (COGS or operating expenses, not both)")
+        deductions.append("❌ Missing either COGS or operating expenses — profit calculation may be incomplete")
     else:
         deductions.append("❌ No cost data — financial flags may be incomplete")
-
+        
+    if monthly_cogs == 0:
+        deductions.append("⚠️ COGS entered as exactly ₹0 — confirm this is accurate, since it critically affects margin and profit calculations")
+    if monthly_operating_expenses == 0:
+        deductions.append("⚠️ Operating expenses entered as exactly ₹0 — confirm this is accurate, since it critically affects cash burn calculations")
     if cash_on_hand > 0:
         score += 20
         reasons.append("✅ Cash position provided")
@@ -48,7 +56,8 @@ def calculate_confidence(monthly_revenue, monthly_costs, cash_on_hand, descripti
         deductions.append("❌ Description too vague — analysis will be generic")
 
     # Sanity check on numbers
-    if monthly_revenue > 0 and monthly_costs > monthly_revenue * 5:
+    monthly_total_costs = monthly_cogs + monthly_operating_expenses
+    if monthly_revenue > 0 and monthly_total_costs > monthly_revenue * 5:
         deductions.append("⚠️ Costs are 5x revenue — please double check your numbers")
         score = max(0, score - 15)
 

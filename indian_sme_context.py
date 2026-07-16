@@ -1,6 +1,6 @@
 import datetime
 
-def get_indian_sme_context(business_type, crisis_type, monthly_revenue, monthly_costs, cash_on_hand):
+def get_indian_sme_context(business_type, crisis_type, monthly_revenue, monthly_cogs, monthly_operating_expenses, cash_on_hand):
     """
     Deterministically generates Indian SME-specific context
     before the LLM sees any data. This is what makes this tool
@@ -12,8 +12,9 @@ def get_indian_sme_context(business_type, crisis_type, monthly_revenue, monthly_
     scheme_suggestions = []
 
     current_month = datetime.datetime.now().month
-    monthly_profit = monthly_revenue - monthly_costs
-    cash_runway = cash_on_hand / monthly_costs if monthly_costs > 0 else 0
+    monthly_total_costs = monthly_cogs + monthly_operating_expenses
+    monthly_profit = monthly_revenue - monthly_total_costs
+    cash_runway = cash_on_hand / monthly_total_costs if monthly_total_costs > 0 else 0
     annual_revenue = monthly_revenue * 12
 
     # === SEASONAL PRESSURE FLAGS ===

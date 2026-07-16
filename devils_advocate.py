@@ -5,7 +5,7 @@ load_dotenv()
 
 def run_devils_advocate(
     business_type, crisis_type,
-    monthly_revenue, monthly_costs, cash_on_hand,
+    monthly_revenue, monthly_cogs, monthly_operating_expenses, cash_on_hand,
     ai_recommendation, framework_name, guardrail_result
 ):
     """
@@ -14,7 +14,7 @@ def run_devils_advocate(
     This is what separates a trusted advisor from a yes-man chatbot.
     """
 
-    monthly_profit = monthly_revenue - monthly_costs
+    monthly_profit = guardrail_result.get("net_profit", monthly_revenue - (monthly_cogs + monthly_operating_expenses))
     cash_runway = guardrail_result.get("cash_runway_months", 0)
     gross_margin = guardrail_result.get("gross_margin_percent", 0)
 
@@ -38,7 +38,8 @@ Business Context:
 - Type: {business_type}
 - Crisis: {crisis_type}
 - Monthly Revenue: ₹{monthly_revenue}
-- Monthly Costs: ₹{monthly_costs}
+- Monthly COGS: ₹{monthly_cogs}
+- Monthly Operating Expenses: ₹{monthly_operating_expenses}
 - Cash on Hand: ₹{cash_on_hand}
 - Financial Risk Flags: {risk_summary}
 - Framework Used: {framework_name}

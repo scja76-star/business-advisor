@@ -1,5 +1,5 @@
 def generate_trace(business_type, crisis_type, monthly_revenue, 
-                   monthly_costs, cash_on_hand, framework, 
+                   monthly_cogs, monthly_operating_expenses, cash_on_hand, framework,
                    guardrail, confidence):
 
     trace = []
@@ -19,7 +19,7 @@ def generate_trace(business_type, crisis_type, monthly_revenue,
     })
 
     # Step 3: Financial assessment
-    profit = monthly_revenue - monthly_costs
+    profit = profit = guardrail.get("net_profit", monthly_revenue - (monthly_cogs + monthly_operating_expenses))
     if profit < 0:
         financial_note = f"Business is loss-making by ₹{abs(profit):,}/month — survival protocols prioritized"
     elif profit == 0:

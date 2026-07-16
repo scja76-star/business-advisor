@@ -131,15 +131,18 @@ with col1:
     business_type = st.selectbox("Business Type",
         ["Retail", "Restaurant", "Service Business", "Manufacturing", "Other"])
 
-st.markdown("**Fnancial Position (Monthly)**")
-col1, col2, col3 = st.columns(3)
+st.markdown("**Financial Position (Monthly)**")
+col1, col2, col3, col4 = st.columns(4)
 with col1:
     monthly_revenue = st.number_input("Revenue (₹)", min_value=0, help="Your total monthly income")
 
 with col2:
-    monthly_costs = st.number_input("Costs (₹)", min_value=0, help="Your total monthly expenses")
+    monthly_cogs = st.number_input("COGS (₹)", min_value=0, help="Direct cost to produce/deliver what you sell — raw materials, production labor, purchase cost of goods resold. NOT rent, salaries, or admin.")
 
 with col3:
+    monthly_operating_expenses = st.number_input("Operating Expenses (₹)", min_value=0, help="Rent, salaries, utilities, admin — everything except COGS.")
+
+with col4:
     cash_on_hand = st.number_input("Cash on Hand (₹)", min_value=0, help="Money available right now")
 
 situation_text = st.text_area("Describe your situation",
@@ -160,54 +163,51 @@ if analyze_button:
             # Step 0: Indian SME Context (deterministic, runs before everything)
             sme_context = get_indian_sme_context(
                 business_type, crisis_type,
-                monthly_revenue, monthly_costs, cash_on_hand
+                monthly_revenue, monthly_cogs, monthly_operating_expenses, cash_on_hand
             )
 
             # Step 1: Confidence
             confidence = calculate_confidence(
-                monthly_revenue, monthly_costs, cash_on_hand, situation_text
+            monthly_revenue, monthly_cogs, monthly_operating_expenses, cash_on_hand, situation_text
             )
 
             # Step 2: Framework
-            framework = match_framework(crisis_type, monthly_revenue, monthly_costs, cash_on_hand)
+            framework = match_framework(crisis_type, monthly_revenue, monthly_cogs, monthly_operating_expenses, cash_on_hand)
+            framework_business_mismatch = business_type != "Manufacturing" and crisis_type in ["Cash flow problems", "Costs are too high", "Operational bottleneck"]
 
             # Step 3: AI
             prompt = f"""
-You are a business crisis advisor analyzing a specific situation.
+                You are a business crisis advisor analyzing a specific situation.
 
-Business Type: {business_type}
-Crisis: {crisis_type}
-Monthly Revenue: ₹{monthly_revenue}
-Monthly Costs: ₹{monthly_costs}
-Cash on Hand: ₹{cash_on_hand}
-Owner's situation: {situation_text}
+                Monthly Revenue: ₹{monthly_revenue}
+                Monthly COGS: ₹{monthly_cogs}
+                Gross Profit: ₹{monthly_revenue - monthly_cogs} (Margin: {round((monthly_revenue - monthly_cogs) / monthly_revenue * 100, 1) if monthly_revenue > 0 else 0}%)
+                Monthly Operating Expenses: ₹{monthly_operating_expenses}
+                Net Profit: ₹{monthly_revenue - monthly_cogs - monthly_operating_expenses}
+                Cash on Hand: ₹{cash_on_hand}
 
-Strategic Framework: {framework['framework']}
-Framework context: {framework['description']}
-Framework key actions: {', '.join(framework['key_actions'])}
+                Your immediate_action MUST align with and reference the framework key actions above. Do not contradict them.
+                Confidence Level: {confidence['level']}
 
-Your immediate_action MUST align with and reference the framework key actions above. Do not contradict them.
-Confidence Level: {confidence['level']}
+                Seasonal Market Flags — use these flags to make your advice specific to Indian small business realities:
+                {chr(10).join(sme_context['all_context']) if sme_context['all_context'] else 'No specific seasonal or market flags this month.'}
 
-Seasonal Market Flags — use these flags to make your advice specific to Indian small business realities:
-{chr(10).join(sme_context['all_context']) if sme_context['all_context'] else 'No specific seasonal or market flags this month.'}
+                Crisis-Specific Indian SME Context — use these framework-specific Indian SME insights to tailor the plan:
+                {framework.get('indian_sme_context', 'No crisis-specific Indian SME context available.')}
 
-Crisis-Specific Indian SME Context — use these framework-specific Indian SME insights to tailor the plan:
-{framework.get('indian_sme_context', 'No crisis-specific Indian SME context available.')}
+                You must respond in this exact JSON format and nothing else:
+                {{
+                    "root_cause": "one sentence diagnosis of the core problem",
+                    "urgency_level": "CRITICAL or HIGH or MEDIUM or LOW",
+                    "immediate_action": "single most important action to take this week",
+                    "metric_to_track": "one specific financial metric to measure daily",
+                    "risk_if_ignored": "what happens in 30 days if nothing changes",
+                "realistic_timeline": "honest estimate of how long recovery will take",
+                    "unified_plan": "2-3 sentence action plan combining the framework actions and your diagnosis into one coherent strategy"
+                }}
 
-You must respond in this exact JSON format and nothing else:
-{{
-    "root_cause": "one sentence diagnosis of the core problem",
-    "urgency_level": "CRITICAL or HIGH or MEDIUM or LOW",
-    "immediate_action": "single most important action to take this week",
-    "metric_to_track": "one specific financial metric to measure daily",
-    "risk_if_ignored": "what happens in 30 days if nothing changes",
-   "realistic_timeline": "honest estimate of how long recovery will take",
-    "unified_plan": "2-3 sentence action plan combining the framework actions and your diagnosis into one coherent strategy"
-}}
-
-Return only the JSON. No explanation before or after.
-"""
+                Return only the JSON. No explanation before or after.
+                """
             
             response = client.models.generate_content(
                 model="gemini-2.5-flash",
@@ -216,22 +216,19 @@ Return only the JSON. No explanation before or after.
             ai_response = response.text
 
             # Step 4: Guardrail
-            guardrail = run_math_guardrail(
-                monthly_revenue, monthly_costs, cash_on_hand, ai_response
-            )
-
+            guardrail = run_math_guardrail(monthly_revenue, monthly_cogs, monthly_operating_expenses, cash_on_hand, ai_response)
            
 
            # Step 5: Devil's Advocate
             devils_advocate_raw = run_devils_advocate(
                 business_type, crisis_type,
-                monthly_revenue, monthly_costs, cash_on_hand,
+                monthly_revenue, monthly_cogs, monthly_operating_expenses, cash_on_hand,
                 ai_response, framework['framework'], guardrail
             )
 
             # --- SCENARIO STRESS TESTER ---
-            if monthly_revenue and monthly_costs and cash_on_hand:
-                stress_results = run_scenario_stress_test(monthly_revenue, monthly_costs, cash_on_hand)
+            if monthly_revenue and monthly_cogs is not None and monthly_operating_expenses is not None and cash_on_hand:
+                stress_results = run_scenario_stress_test(monthly_revenue, monthly_cogs, monthly_operating_expenses, cash_on_hand)
     
                 with st.expander("⚡ Scenario Stress Tests", expanded=False):
                     st.markdown("### What if conditions change?")
@@ -241,7 +238,7 @@ Return only the JSON. No explanation before or after.
                         st.markdown(f"**{scenario['label']}**")
                         col1, col2, col3 = st.columns(3)
                         with col1:
-                            st.metric("Monthly Profit", f"₹{scenario['monthly_profit']:,}")
+                            st.metric("Net Profit", f"₹{scenario['net_profit']:,}")
                         with col2:
                             st.metric("Cash Runway", f"{scenario['cash_runway_months']} months")
                         with col3:
@@ -250,8 +247,8 @@ Return only the JSON. No explanation before or after.
 
             # Step 6: Trace
             trace = generate_trace(
-                business_type, crisis_type, monthly_revenue,
-                monthly_costs, cash_on_hand, framework,
+                business_type, crisis_type,monthly_revenue,
+                monthly_cogs, monthly_operating_expenses, cash_on_hand, framework,
                 guardrail, confidence
             )
 
@@ -267,6 +264,11 @@ Return only the JSON. No explanation before or after.
             st.warning(f"⚠️ Analysis Confidence: {confidence['level']} ({confidence['score']}/100) — {confidence['summary']}")
         else:
             st.error(f"❌ Analysis Confidence: {confidence['level']} ({confidence['score']}/100) — {confidence['summary']}")
+
+        if confidence["deductions"]:
+            with st.expander("Why this confidence score? (data gaps detected)"):
+                for deduction in confidence["deductions"]:
+                    st.write(deduction)
 
         # Financial flags
         if guardrail["flags"] or guardrail["warnings"]:
@@ -304,9 +306,10 @@ Return only the JSON. No explanation before or after.
         # Financial position
         st.markdown("**💰 Your Financial Position**")
         col1, col2, col3 = st.columns(3)
-        col1.metric("Monthly Profit/Loss", f"₹{guardrail['monthly_profit']:,}")
+        col1.metric("Monthly Profit/Loss", f"₹{guardrail['net_profit']:,}")
         col2.metric("Cash Runway", f"{guardrail['cash_runway_months']} months")
         col3.metric("Cost Ratio", f"{guardrail['cost_ratio_percent']}%")
+        st.caption(guardrail['math_trace'])
 
         st.markdown("---")
 
@@ -341,7 +344,8 @@ Return only the JSON. No explanation before or after.
 
 
         # 9. Vendor credit before external debt
-        if crisis_type == "Cash flow problems" or (cash_on_hand / (monthly_costs if monthly_costs > 0 else 1) < 3 and (monthly_revenue - monthly_costs) < 0):
+        monthly_total_costs = monthly_cogs + monthly_operating_expenses
+        if crisis_type == "Cash flow problems" or (cash_on_hand / (monthly_total_costs if monthly_total_costs > 0 else 1) < 3 and (monthly_revenue - monthly_total_costs) < 0):
              st.warning("🤝 **Prioritize Vendor Credit:** Before seeking new loans (e.g., ECLGS), aggressively renegotiate payment terms with existing vendors. This is often the fastest, lowest-cost source of temporary liquidity.")
         st.markdown("---")
 
@@ -349,6 +353,8 @@ Return only the JSON. No explanation before or after.
         st.markdown(f"**🎯 Strategic Framework: {framework['framework']}**")
         priority_color = "🔴" if framework['priority'] == "CRITICAL" else "🟡" if framework['priority'] == "HIGH" else "🟢"
         st.markdown(f"{priority_color} Priority: **{framework['priority']}**")
+        if framework_business_mismatch:
+            st.warning(f"⚠️ This framework's examples are written for manufacturing businesses. You selected **{business_type}** — treat the factory-floor specifics (WIP, batch sizes, machinery) as illustrative of the underlying principle, not literal instructions.")
         st.info(framework['description'])
 
         st.markdown("**Key Actions from Framework:**")
