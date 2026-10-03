@@ -11,7 +11,21 @@ from math_guardrail import run_math_guardrail
 from confidence_rating import calculate_confidence
 from explainability_trace import generate_trace
 from indian_sme_context import get_indian_sme_context
-client = genai.Client(api_key=os.environ.get("GOOGLE_API_KEY"))
+def get_api_key():
+    try:
+        if "GOOGLE_API_KEY" in st.secrets:
+            return st.secrets["GOOGLE_API_KEY"]
+    except Exception:
+        pass
+    return os.environ.get("GOOGLE_API_KEY")
+
+API_KEY = get_api_key()
+if not API_KEY:
+    st.error("GOOGLE_API_KEY is not configured. Add it under Manage app → Settings → Secrets.")
+    st.stop()
+
+os.environ["GOOGLE_API_KEY"] = API_KEY  # so devils_advocate.py picks it up too
+client = genai.Client(api_key=API_KEY)
 
 VALID_CRISIS_TYPES = [
     "Cash flow problems",
@@ -28,7 +42,6 @@ def classify_crisis(free_text: str) -> str:
     prompt = f"""You are a business crisis classifier for Indian SMEs.
 
 A business owner has described their situation. Your ONLY job is to classify it into exactly one of these crisis types:
-
 1. Cash flow problems
 2. Sales have dropped significantly (customers/market still exist, but conversion, retention, or competitive positioning has weakened. Example inputs: "sales are down", "we're losing deals we used to win", "revenue dropped this quarter")
 3. Costs are too high
@@ -52,6 +65,7 @@ Rules:
     classified = response.text.strip()
     
     if classified not in VALID_CRISIS_TYPES:
+        print(f"⚠️ FALLBACK TRIGGERED — Gemini returned invalid output: {classified!r}")
         classified = "Cash flow problems"
     
     return classified
@@ -313,21 +327,8 @@ if analyze_button:
 
         st.markdown("---")
 
-
-
-
-
-
-
-
-
-
-        st.markdown("#### 🤔 Universal Diagnostic Question: **How many days between raw material entering your factory and cash arriving in your bank?** (This measures WIP/inventory-as-trapped-cash)")
+        st.markdown("#### 🤔 Universal Diagnostic Question: **How many days pass between committing money or effort to a sale — buying stock, doing the work — and cash actually arriving in your bank?** (This measures how long your cash stays trapped before it's usable)")
         st.markdown("---")
-
-
-
-
 
         # New JTBD-style question
         if crisis_type in ["Sales have dropped significantly", "Demand has fallen", "Losing customers to competitors"]:
@@ -374,19 +375,12 @@ if analyze_button:
             st.warning("⚠️ AI advice shown with caution — review flagged items above.")
         try:
 
-
-
             clean = ai_response.strip()
             if clean.startswith("```"):
                 clean = clean.split("```")[1]
             if clean.startswith("json"):
                 clean = clean[4:]
             analysis = json.loads(clean)
-
-
-
-
-
 
             urgency = analysis.get("urgency_level", "MEDIUM")
             if urgency == "CRITICAL":
@@ -395,19 +389,9 @@ if analyze_button:
                 st.warning(f"⚠️ Urgency Level: {urgency}")
             else:
 
-
-
-
-
                 st.info(f"ℹ️ Urgency Level: {urgency}")
             col1, col2 = st.columns(2)
             with col1:
-
-
-
-
-
-
 
                 st.markdown("**🔍 Root Cause**")
                 st.write(analysis.get("root_cause", ""))
@@ -427,21 +411,6 @@ if analyze_button:
 
             st.write(ai_response)
         st.markdown("---")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         # Devil's Advocate
         st.markdown("**😈 Devil's Advocate — Why This Advice Could Fail**")
